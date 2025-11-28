@@ -22,7 +22,10 @@ WiFiManager wifiManager;
 const char* AP_PASS = SECRET_AP_PASS;
 
 // Rain detection threshold
-int RAIN_THRESHOLD = 4000; 
+int RAIN_THRESHOLD = 3700; 
+
+// A RTC variable to remember deep sleep cycles
+RTC_DATA_ATTR int bootCount = 0;
 
 // Function declaration
 void connectToNetwork();
@@ -48,14 +51,13 @@ void setup() {
   delay(100); // Wait for sensor to stabilize 
   int analogValue = analogRead(RAIN_SENSOR_ANALOG);
   digitalWrite(RAIN_SENSOR_POWER, LOW); // Save power immediately
-  Serial.print("Rain Sensor Analog Value: ");  Serial.print(analogValue);
+  Serial.print("Rain Sensor Analog Value: ");  Serial.println(analogValue);
   
   if (analogValue < RAIN_THRESHOLD) {  // Rain detected!
     while (true) {     // Stay in this loop until deactivated
       // Connect and send message
       if (WiFi.status() != WL_CONNECTED) {
         connectToNetwork();        
-        client.setInsecure(); // Necessary for Telegram (skips certificate validation for speed/ease)
       }
 
       // Check for deactivation command
@@ -81,13 +83,26 @@ void setup() {
     }
   }
 
+  // Every 10 minutes, connect to WiFi to receive any commands and reply accordingly
+  bootCount++;
+  if (bootCount >= 60) {
+    bootCount = 0; // Reset counter
+    connectToNetwork();
+    String lastCommand = getLastCommand();
+    if (lastCommand == "/status") {
+      bot.sendMessage(CHAT_ID, "All clear! No rain detected. ☀️");
+    }
+  }
+
   // No rain? Go to sleep for 10 seconds
   Serial.println("Going to sleep.");
   esp_deep_sleep(10 * 1000000ULL);
+
 }
 
 void loop() {
   // Nothing here when using deep sleep
+
 }
 
 void connectToNetwork() {
@@ -106,29 +121,30 @@ void connectToNetwork() {
 
   Serial.print("..connected! IP Address: ");
   Serial.println(WiFi.localIP());
+
+  client.setInsecure(); // Necessary for Telegram (skips certificate validation for speed/ease)
 }
 
 String getLastCommand() {
-  // Check for updates (offset + 1 marks previous messages as read)
+  // Get the messages
   int numNewMessages = bot.getUpdates(bot.last_message_received + 1);
 
-  // If no messages, return empty immediately
-  if (numNewMessages == 0) {
-    return "";
-  }
+  if (numNewMessages > 0) {
+    // Grab the text of the very last message in the batch
+    String lastText = bot.messages[numNewMessages - 1].text; 
+    String lastChatId = bot.messages[numNewMessages - 1].chat_id;
 
-  String lastText = "";
-  // Loop through all new messages
-  for (int i = 0; i < numNewMessages; i++) {
-    String chat_id = bot.messages[i].chat_id;
-    
-    // SECURITY CHECK: Ignore messages from strangers
-    if (chat_id == SECRET_CHAT_ID) {
-      // We keep overwriting 'lastText', so by the end of the loop, we hold the very latest message sent.
-      lastText = bot.messages[i].text;
+    // Force a quick update to tell Telegram: "I have seen up to this message."
+    bot.getUpdates(bot.last_message_received + 1);
+
+    // Security Check
+    if (lastChatId == SECRET_CHAT_ID) {
+      Serial.println("Received & Flushed command: " + lastText);
+      return lastText;
     }
   }
-  return lastText;
+  
+  return "";
 }
 
 void playTone(int frequency, int durationMs) {
