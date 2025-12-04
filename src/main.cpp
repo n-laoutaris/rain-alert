@@ -4,12 +4,10 @@
 #include <UniversalTelegramBot.h>
 #include <ArduinoJson.h>  
 #include "secrets.h"
+#include "pins_config.h"
 
 // Defining attached components
-const int PRG = 0;
-const int BUZZER = 22;
-const int RAIN_SENSOR_ANALOG = 37;
-const int RAIN_SENSOR_POWER = 13;
+// Through pins_config, for multi-board support
 
 // Telegram bot 
 const char* BOT_TOKEN = SECRET_BOT_TOKEN;
@@ -22,7 +20,7 @@ WiFiManager wifiManager;
 const char* AP_PASS = SECRET_AP_PASS;
 
 // Rain detection threshold
-int RAIN_THRESHOLD = 3700; 
+int RAIN_THRESHOLD = 3500; 
 
 // A RTC variable to remember deep sleep cycles
 RTC_DATA_ATTR int bootCount = 0;
@@ -67,7 +65,7 @@ void setup() {
         esp_deep_sleep(30 * 60 * 1000000ULL); // Sleep (until power is cut manually from the user) 
       }
 
-      bot.sendMessage(CHAT_ID, "Run! Your clothes are getting wet! ☔️ (Send /ok to deactivate.)");
+      bot.sendMessage(CHAT_ID, "Run! Your clothes are getting wet! ☔️ (Send /ok to deactivate.) Sensor value: " + String(analogValue));
       // playAlarm(); // Maybe someday
 
       // Give a time window of 5 seconds to deactivate station through a button press
@@ -90,7 +88,7 @@ void setup() {
     connectToNetwork();
     String lastCommand = getLastCommand();
     if (lastCommand == "/status") {
-      bot.sendMessage(CHAT_ID, "All clear! No rain detected. ☀️");
+      bot.sendMessage(CHAT_ID, "I'm here! All clear! No rain detected. ☀️");
     }
   }
 
