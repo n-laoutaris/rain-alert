@@ -1,36 +1,28 @@
-⛈️ Vroxoulis (The Little Rainy Man)
+# Vroxoulis The Little Rainy Man
 
 An autonomous, ultra-low-power IoT agent that protects laundry from unpredictable weather.
 
-1. The Problem (The "Ouch" Moment)
+## The Problem
 
-Living in Thessaloniki, the weather is notoriously bipolar. I frequently faced a domestic inefficiency: hanging laundry to dry, getting distracted by work, and realizing too late that a sudden rainstorm had soaked the clothes.
+In Thessaloniki, the weather is notoriously bipolar. I frequently faced a domestic inefficiency: hanging laundry to dry, getting distracted by work, and realizing too late that a sudden rainstorm had soaked the clothes.
 
-This resulted in:
+## The Solution
 
-Resource Loss: Wasted electricity (re-washing) and time.
+Vroxoulis is a "set-and-forget" guardian that notifies me when action is required, with zero maintenance for months. A standalone IoT device powered by an ESP32-C3 microcontroller, it sits on the balcony rail and monitors environmental moisture.
 
-Inefficiency: The mental load of constantly checking the window.
+Upon detecting rain, it utilizes the Telegram Bot API to send a push notification directly to my phone. It features a "Snooze" logic to prevent alert fatigue.
 
-The Objective: Build a "set-and-forget" guardian that notifies me only when action is required, with zero maintenance for months.
-
-2. The Solution
-
-Vroxoulis is a standalone IoT device powered by an ESP32-C3 microcontroller. It sits on the balcony rail and monitors environmental moisture.
-
-Upon detecting rain, it bypasses local alerts (which might be inaudible from my office) and utilizes the Telegram Bot API to send a push notification directly to my phone. It features a "Snooze" logic to prevent alert fatigue.
-
-3. System Architecture
+## System Architecture
 
 The Hardware Stack
 
-MCU: ESP32-C3 Super Mini (Chosen for RISC-V low power consumption).
+- MCU: ESP32-C3 Super Mini (Chosen for RISC-V low power consumption).
 
-Sensor: Resistive Rain Sensor Module.
+- Sensor: Resistive Rain Sensor Module.
 
-Power: 18650 Li-Ion Battery + TP4056 Charger.
+- Power: 18650 Li-Ion Battery + TP4056 Charger.
 
-Protection: Waterproof Junction Box with hot-glue light pipes for status LEDs.
+- Protection: Waterproof Junction Box with hot-glue light pipes for status LEDs.
 
 The Wiring
 
@@ -48,10 +40,7 @@ graph TD
     Alert --> Sleep
 
 
-
-4. Engineering & Optimization
-
-As a Data Scientist, I treated battery life as an optimization function.
+## Engineering & Optimization
 
 Deep Sleep Strategy: The device does not idle; it shuts down completely. RAM is volatile, so I utilized RTC Memory (Slow Memory) to persist state (Mute flags, Message IDs) across sleep cycles.
 
@@ -59,13 +48,11 @@ Sensor Electrolysis Prevention: Resistive sensors corrode if powered constantly.
 
 The "Amnesia" Fix: Implemented a logic flush to handle Telegram's message offset, ensuring the device doesn't re-read old "stop" commands upon waking.
 
-5. Usage
+## Usage
 
 Clone the Repo:
 
 git clone [https://github.com/n-laoutaris/vroxoulis.git](https://github.com/n-laoutaris/vroxoulis.git)
-
-
 
 Configure Secrets:
 Rename src/secrets.example.h to src/secrets.h and add your WiFi/Telegram credentials.
@@ -80,7 +67,7 @@ env:vroxoulis_original (For DevKit V1)
 Flash:
 Upload via USB.
 
-6. Future Work
+## Future Work
 
 Data Logging: Integrate InfluxDB to log rain duration and frequency in Thessaloniki, comparing local sensor data with OpenWeatherMap API predictions.
 
@@ -88,4 +75,4 @@ Predictive Alerting: Use the pressure sensor (BMP280) to predict rain before the
 
 Solar Autonomy: Add a small 5V solar panel to the TP4056 input for infinite runtime.
 
-Built with ❤️ (and dry socks) by N. Laoutaris.
+Built with ❤️ (and dry socks).
