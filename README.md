@@ -30,6 +30,7 @@ The Logic Pipeline
 
 The system operates on an extreme duty cycle to maximize battery life. It spends 99.9% of its life in Deep Sleep.
 
+```mermaid
 graph TD
     Start((Wake Up)) --> Check[Check Sensor]
     Check -->|Dry| Sleep[Deep Sleep 10s]
@@ -38,7 +39,7 @@ graph TD
     Fetch -->|User said /ok| Mute[Set Mute Flag & Sleep 30m]
     Fetch -->|No Command| Alert[Send Telegram Alert]
     Alert --> Sleep
-
+```
 
 ## Engineering & Optimization
 
