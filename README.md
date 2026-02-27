@@ -2,6 +2,8 @@
 
 An autonomous, ultra-low-power IoT agent that protects laundry from unpredictable weather.
 
+![Schematic](./Images/Vroxoulis_schematic.png)
+
 ## The Problem
 
 In Thessaloniki, the weather is notoriously bipolar. I frequently faced a domestic inefficiency: hanging laundry to dry, getting distracted by work, and realizing too late that a sudden rainstorm had soaked the clothes.
