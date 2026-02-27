@@ -3,8 +3,8 @@
 #include <WiFiClientSecure.h>
 #include <UniversalTelegramBot.h>
 #include <ArduinoJson.h>  
-#include "secrets.h"
-#include "pins_config.h"
+#include <secrets.h>
+#include <pins_config.h>
 
 // Defining attached components
 // Through pins_config, for multi-board support
@@ -19,9 +19,6 @@ UniversalTelegramBot bot(BOT_TOKEN, client);
 WiFiManager wifiManager;
 const char* AP_PASS = SECRET_AP_PASS;
 
-// Rain detection threshold
-int RAIN_THRESHOLD = 3500; 
-
 // A RTC variable to remember deep sleep cycles
 RTC_DATA_ATTR int bootCount = 0;
 
@@ -35,6 +32,7 @@ void setup() {
   // Setup pins
   pinMode(RAIN_SENSOR_POWER, OUTPUT);
   pinMode(RAIN_SENSOR_ANALOG, INPUT);
+  pinMode(BATTERY, INPUT);
   pinMode(PRG, INPUT_PULLUP);
   
   pinMode(BUZZER, OUTPUT);
@@ -62,7 +60,7 @@ void setup() {
       String lastCommand = getLastCommand();
       if (lastCommand == "/ok") {
         bot.sendMessage(CHAT_ID, "Understood! Going to sleep. 😴");
-        esp_deep_sleep(30 * 60 * 1000000ULL); // Sleep (until power is cut manually from the user) 
+        esp_deep_sleep(30 * 60 * 1000000ULL); // Sleep (until power is cut manually from the user)
       }
 
       bot.sendMessage(CHAT_ID, "Run! Your clothes are getting wet! ☔️ (Send /ok to deactivate.) Sensor value: " + String(analogValue));
@@ -88,7 +86,7 @@ void setup() {
     connectToNetwork();
     String lastCommand = getLastCommand();
     if (lastCommand == "/status") {
-      bot.sendMessage(CHAT_ID, "I'm here! All clear! No rain detected. ☀️");
+      bot.sendMessage(CHAT_ID, "I'm here!"); // Battery percentage will go here
     }
   }
 

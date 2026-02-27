@@ -13,7 +13,7 @@
     #define BATTERY       0   
 
     // Calibration
-    #define RAIN_THRESHOLD_MV 2500
+    #define RAIN_THRESHOLD 2500
     #define VOLTAGE_MULTIPLIER 2.0
 
 // ==========================================
@@ -29,7 +29,7 @@
     #define BATTERY       35  // ADC1 Ch7 (Must use ADC1 for WiFi!)
 
     // Calibration
-    #define RAIN_THRESHOLD_MV 1600 // Old ESP32 ADC reads lower generally
+    #define RAIN_THRESHOLD 1600 // Old ESP32 ADC reads lower generally
     #define VOLTAGE_MULTIPLIER 2.0
 
 #else
