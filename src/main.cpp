@@ -6,8 +6,7 @@
 #include <secrets.h>
 #include <pins_config.h>
 
-// Defining attached components
-// Through pins_config, for multi-board support
+// Define attached components Through pins_config, for multi-board support
 
 // Telegram bot 
 const char* BOT_TOKEN = SECRET_BOT_TOKEN;
