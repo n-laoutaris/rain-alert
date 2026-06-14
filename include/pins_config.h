@@ -13,8 +13,9 @@
     #define BATTERY       0   
 
     // Calibration
-    #define RAIN_THRESHOLD 2500
+    #define RAIN_THRESHOLD 3500
     #define VOLTAGE_MULTIPLIER 2.0
+    #define BATTERY_OFFSET -30 // Expressed in mV
 
 // ==========================================
 // OPTION B: ESP32 STANDARD (DevKit V1)
@@ -31,7 +32,7 @@
     // Calibration
     #define RAIN_THRESHOLD 1600 // Old ESP32 ADC reads lower generally
     #define VOLTAGE_MULTIPLIER 2.0
-
+    #define BATTERY_OFFSET 0 // Expressed in mV
 #else
     #error "Oops! You must select a board environment in platformio.ini"
 #endif

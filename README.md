@@ -40,10 +40,10 @@ I also implemented the following optimizations:
 
 - Deep Sleep Strategy: RAM is volatile, so I use RTC Memory (Slow Memory) to persist state (Mute flags, Message IDs) across sleep cycles.
 - Sensor Electrolysis Prevention: Resistive sensors corrode if powered constantly. The code powers the sensor rail via a GPIO pin for only 100ms during measurement, extending sensor life by years.
+- Battery Measurement: Self-report battery percentage on command and on reaching critical levels.
 
 ## Future Work
 
-- Battery Measurement: Code an additional functinality to self-report battery percentage on start, on command and on reaching critical levels.
 - Predictive Behaviour: Fetch OpenWeatherMap API data to increase or decrease sampling rate based on risk of rain.
 - Local Weather Monitoring: Use a pressure sensor (BMP280) to corrwlate barometric drops with API predictions.
 

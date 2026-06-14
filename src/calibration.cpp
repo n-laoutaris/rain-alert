@@ -18,9 +18,6 @@ UniversalTelegramBot bot(BOT_TOKEN, client);
 WiFiManager wifiManager;
 const char* AP_PASS = SECRET_AP_PASS;
 
-// A RTC variable to remember deep sleep cycles
-RTC_DATA_ATTR int bootCount = 0;
-
 // Function declaration
 void connectToNetwork();
 String getLastCommand();
@@ -40,8 +37,10 @@ void setup() {
   // ledcSetup(0, 2000, 8);
   // playTone(0,0); // Start muted
 
-  Serial.begin(115200);
+  Serial.begin(115200);  
+}
 
+void loop() {
   // Begin detection routine
   digitalWrite(RAIN_SENSOR_POWER, HIGH); // Power the rain sensor
   delay(100); // Wait for sensor to stabilize 
@@ -50,75 +49,36 @@ void setup() {
   Serial.print("Rain Sensor Analog Value: ");  Serial.println(analogValue);
   
   if (analogValue < RAIN_THRESHOLD) {  // Rain detected!
-    while (true) {     // Stay in this loop until deactivated
+
       // Connect and send message
       if (WiFi.status() != WL_CONNECTED) {
         connectToNetwork();        
       }
-
-      // Check for deactivation command
-      String lastCommand = getLastCommand();
-      if (lastCommand == "/ok") {
-        bot.sendMessage(CHAT_ID, "Understood! Going to sleep. 😴");
-        esp_deep_sleep(30 * 60 * 1000000ULL); // Sleep (until power is cut manually from the user)
-      }
-
       bot.sendMessage(CHAT_ID, "Run! Your clothes are getting wet! ☔️ (Send /ok to deactivate.) Sensor value: " + String(analogValue));
-      // playAlarm(); // Maybe someday
-
-      // Give a time window of 5 seconds to deactivate station through a button press
-      unsigned long startTime = millis();
-      while (millis() - startTime < 5000) {
-        int state = digitalRead(PRG);
-        if (state == LOW) {  // Button pressed 
-          bot.sendMessage(CHAT_ID, "Manual override. Going to sleep. 😴");
-          esp_deep_sleep(30 * 60 * 1000000ULL); // Sleep (until power is cut manually from the user) 
-        }
-        delay(50); // Small delay to avoid busy looping
-      }
-    }
   }
 
-  // Every 10 minutes, connect to WiFi to receive any commands and reply accordingly
-  bootCount++;
-  if (bootCount >= 60) {
-    bootCount = 0; // Reset counter
-    float battery = getBatteryPercentage();
-    if (WiFi.status() != WL_CONNECTED) {
-      connectToNetwork();        
-    }
-    String lastCommand = getLastCommand();
-    if (lastCommand == "/status") {
-      bot.sendMessage(CHAT_ID, "I'm here! My battery is at approximately " + String(battery) + "%."); 
-    }
-    else if (battery <= 20.0) {
-      bot.sendMessage(CHAT_ID, "I need recharging soon! My battery is at approximately " + String(battery) + "%!"); 
-    }
-  }
+  float battery = getBatteryPercentage();
+  Serial.print("Battery percentage:");  Serial.println(battery);
 
   // No rain? Go to sleep for 10 seconds
-  Serial.println("Going to sleep.");
-  esp_deep_sleep(10 * 1000000ULL);
+  Serial.println("Going to sleep. (2s)");
+  delay(2000);
 
-}
-
-void loop() {
-  // Nothing here when using deep sleep
 
 }
 
 void connectToNetwork() {
   Serial.print("Connecting to WiFi ");
+  wifiManager.setConnectTimeout(120);
 
-  // If you can't connect to WiFi, open the AP portal but only for 60 seconds
-  wifiManager.setConfigPortalTimeout(60); 
+  // If you can't connect to WiFi, open the AP portal 
+  wifiManager.setConfigPortalTimeout(120); 
 
-  // This starts the AP portal if no WiFi credentials are stored, for 60 seconds
+  // This starts the AP portal if no WiFi credentials are stored,
   wifiManager.autoConnect("Vroxoulis_AP", AP_PASS);
 
   if (WiFi.status() != WL_CONNECTED) {
-    Serial.print("Failed to connect and hit timeout. Going to sleep.");
-    esp_deep_sleep(10 * 1000000ULL); // Sleep for 10 seconds
+    Serial.print("Failed to connect and hit timeout.");
   }
 
   Serial.print("..connected! IP Address: ");
