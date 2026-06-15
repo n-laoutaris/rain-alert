@@ -50,7 +50,6 @@ void loop() {
   Serial.print("Rain Sensor Analog Value: ");  Serial.println(analogValue);
   
   if (analogValue < RAIN_THRESHOLD) {  // Rain detected!
-    digitalWrite(LED, HIGH);  
     // Connect and send message
     if (WiFi.status() != WL_CONNECTED) {
       connectToNetwork();        
@@ -76,7 +75,7 @@ void loop() {
 
 void connectToNetwork() {
   Serial.print("Connecting to WiFi ");
-  wifiManager.setConnectTimeout(120);
+  digitalWrite(LED, HIGH); // Turn on LED to indicate WiFi connection attempt
 
   // If you can't connect to WiFi, open the AP portal 
   wifiManager.setConfigPortalTimeout(120); 
@@ -92,6 +91,7 @@ void connectToNetwork() {
   Serial.println(WiFi.localIP());
 
   client.setInsecure(); // Necessary for Telegram (skips certificate validation for speed/ease)
+  digitalWrite(LED, LOW); // Turn off LED to indicate WiFi connection success
 }
 
 String getLastCommand() {
