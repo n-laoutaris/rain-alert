@@ -34,6 +34,7 @@ void setup() {
   pinMode(RAIN_SENSOR_ANALOG, INPUT);
   pinMode(BATTERY, INPUT);
   pinMode(PRG, INPUT_PULLUP);
+  pinMode(LED, OUTPUT);
   
   // pinMode(BUZZER, OUTPUT);
   // ledcAttachPin(BUZZER, 0);
@@ -51,6 +52,7 @@ void setup() {
   
   if (analogValue < RAIN_THRESHOLD) {  // Rain detected!
     while (true) {     // Stay in this loop until deactivated
+      digitalWrite(LED, HIGH);
       // Connect and send message
       if (WiFi.status() != WL_CONNECTED) {
         connectToNetwork();        
@@ -65,7 +67,12 @@ void setup() {
 
       bot.sendMessage(CHAT_ID, "Run! Your clothes are getting wet! ☔️ (Send /ok to deactivate.) Sensor value: " + String(analogValue));
       // playAlarm(); // Maybe someday
-
+      for (int i = 0; i < 10; i++) {  // blink led 10 times
+        digitalWrite(LED, HIGH);
+        delay(50); // Pause between alarms
+        digitalWrite(LED, LOW);
+        delay(50); // Pause between alarms
+      }
       // Give a time window of 5 seconds to deactivate station through a button press
       unsigned long startTime = millis();
       while (millis() - startTime < 5000) {
@@ -91,9 +98,9 @@ void setup() {
     if (lastCommand == "/status") {
       bot.sendMessage(CHAT_ID, "I'm here! My battery is at approximately " + String(battery) + "%."); 
     }
-    else if (battery <= 20.0) {
-      bot.sendMessage(CHAT_ID, "I need recharging soon! My battery is at approximately " + String(battery) + "%!"); 
-    }
+    // else if (battery <= 20.0) {
+    //   bot.sendMessage(CHAT_ID, "I need recharging soon! My battery is at approximately " + String(battery) + "%!"); 
+    // }
   }
 
   // No rain? Go to sleep for 10 seconds

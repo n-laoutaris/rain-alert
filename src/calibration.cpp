@@ -31,6 +31,7 @@ void setup() {
   pinMode(RAIN_SENSOR_ANALOG, INPUT);
   pinMode(BATTERY, INPUT);
   pinMode(PRG, INPUT_PULLUP);
+  pinMode(LED, OUTPUT);
   
   // pinMode(BUZZER, OUTPUT);
   // ledcAttachPin(BUZZER, 0);
@@ -49,12 +50,18 @@ void loop() {
   Serial.print("Rain Sensor Analog Value: ");  Serial.println(analogValue);
   
   if (analogValue < RAIN_THRESHOLD) {  // Rain detected!
-
-      // Connect and send message
-      if (WiFi.status() != WL_CONNECTED) {
-        connectToNetwork();        
-      }
-      bot.sendMessage(CHAT_ID, "Run! Your clothes are getting wet! ☔️ (Send /ok to deactivate.) Sensor value: " + String(analogValue));
+    digitalWrite(LED, HIGH);  
+    // Connect and send message
+    if (WiFi.status() != WL_CONNECTED) {
+      connectToNetwork();        
+    }
+    bot.sendMessage(CHAT_ID, "Run! Your clothes are getting wet! ☔️ (Send /ok to deactivate.) Sensor value: " + String(analogValue));
+    for (int i = 0; i < 10; i++) {  // blink led 10 times
+      digitalWrite(LED, HIGH);
+      delay(50); // Pause between alarms
+      digitalWrite(LED, LOW);
+      delay(50); // Pause between alarms
+    }
   }
 
   float battery = getBatteryPercentage();
